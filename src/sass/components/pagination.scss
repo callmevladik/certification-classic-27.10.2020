@@ -1,0 +1,46 @@
+.pagination {
+	$this: &;
+
+	display: flex;
+	padding: 0;
+	margin: 0;
+
+	&__cell {
+		display: flex;
+	}
+
+	&__item {
+		list-style-type: none;
+	}
+
+	&__link {
+		position: relative;
+		display: block;
+		padding: microbe-rem(2) microbe-rem(6);
+		color: $color-primary-main;
+		background-color: $background-surface;
+		border: 1px solid $border-default;
+		text-decoration: none;
+		transition: background-color $time-fast ease;
+		cursor: pointer;
+		margin: 0 microbe-rem(3);
+		border-radius: microbe-rem(5);
+		user-select: none;
+
+		&:hover {
+			background-color: $background-hover;
+		}
+
+		&:active,
+		&.active {
+			color: $color-text-contrasText;
+			background-color: $background-active;
+		}
+
+		@include microbe-media($microbe-breakpoint-md) {
+			border-radius: microbe-rem(10);
+			margin: 0 microbe-rem(4);
+			padding: microbe-rem(8) microbe-rem(12);
+		}
+	}
+}
