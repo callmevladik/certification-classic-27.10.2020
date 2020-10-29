@@ -17,5 +17,5 @@ import data from "js#/data/goods.json";
 
 jQuery(function ($) {
 	filter('.js-filter');
-	render('#product-card', data);
+	// render('#product-card', data);
 });

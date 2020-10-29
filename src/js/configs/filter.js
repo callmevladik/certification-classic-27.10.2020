@@ -1,19 +1,24 @@
 import { paramList } from 'js#/configs/paramList';
 
 export const categoryFilterCfg = (serializedArray) => {
-    const [ page, year, priceFrom, priceTo, model, manufacturer, brand, sort, perPage] = paramList;
-    const selectInitialValue = 'Выбрать';
+    const { page, year, price, model, manufacturer, brand, sort, perPage } = paramList;
 
-    const getValues = (paramObjectName) => {
-        const value = serializedArray.filter((paramObject) => paramObject.name === paramObjectName).map((paramObject) => paramObject.value);
-
-        if (value.length === 1 && value.toString() === selectInitialValue) {
-            return '';
-        } else if (value.length === 1) {
-            return value.toString();
+    const getValues = (paramListObj) => {
+        const value = () => {
+            if (paramListObj.multiple) {
+                // console.log(paramListObj.name, typeof paramListObj.name)
+                // paramListObj.name.forEach((el) => el === serializedArray.name)
+                for (let key in paramListObj.name) {
+                    if (paramListObj.name[key] === serializedArray.name) {
+                        return serializedArray.name
+                    }
+                }
+            } else if (paramListObj.parameter === serializedArray.name) {
+                return serializedArray.name;
+            }
         }
 
-        return value;
+        console.log(value())
     }
 
     return {
@@ -22,8 +27,7 @@ export const categoryFilterCfg = (serializedArray) => {
             'manufacturer': getValues(manufacturer),
             'model': getValues(model),
             'year': getValues(year),
-            'price-from' : getValues(priceFrom),
-            'price-to' : getValues(priceTo)
+            'price' : getValues(price)
         },
         'pagination': {
             'sort': getValues(sort),

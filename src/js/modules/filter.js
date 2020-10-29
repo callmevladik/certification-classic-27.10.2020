@@ -12,20 +12,25 @@ export const filter = (selector) => {
 
 	const makeGetParams = (paramObject) => {
 		const flattedParamObject = Object.assign(paramObject.pagination, paramObject.params);
+		// console.log(flattedParamObject)
 		let state = [];
 
-		paramList.forEach((param) => {
-			if (flattedParamObject[param]) {
-				state.push(
-					{
-						'name' : [param],
-						'value' : flattedParamObject[param]
-					}
-				);
-			}
-		})
+		// paramList.forEach((param) => {
+		// 	if (flattedParamObject[param]) {
+		// 		state.push(
+		// 			{
+		// 				'name' : [param],
+		// 				'value' : flattedParamObject[param]
+		// 			}
+		// 		);
+		// 	}
+		// })
 		
-		console.log(state);
+		for (let key in paramList) {
+			
+		}
+		
+		// console.log(state);
 
 		return state;
 	}
