@@ -12,7 +12,7 @@ export const render = (template, data, place, config) => {
             newTemplateInstance.find('[data-model]').text(item.model.name);
             newTemplateInstance.find('[data-price]').text(`${item.price.currency.symbol}${item.price.value}`);
 
-            markup += newTemplateInstance.get(0).outerHTML
+            markup += newTemplateInstance[0].outerHTML
         })
 
         return markup;
