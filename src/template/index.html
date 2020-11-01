@@ -61,7 +61,7 @@
 										name="manufacturer"
 										class="select js-filter"
 									>
-										<option>Выбрать</option>
+										<option value=""></option>
 										<option value="1">Наш автопром</option>
 										<option value="2">V43</option>
 										<option value="3">SSM</option>
@@ -80,12 +80,12 @@
 										name="filter-model"
 										class="select js-filter"
 									>
-										<option>Выбрать</option>
+										<option value=""></option>
 										<option value="1" checked>ГАЗ</option>
 										<option value="2">ЗиЛ</option>
 										<option value="3">BMW</option>
 										<option value="4">Mercedes</option>
-										<option value="4">Daimler</option>
+										<option value="5">Daimler</option>
 									</select>
 								</div>
 							</div>
@@ -99,7 +99,7 @@
 										name="year"
 										class="select js-filter"
 									>
-										<option value="">Выбрать</option>
+										<option value=""></option>
 										<optgroup label="70-ые">
 											<option value="1973">1973</option>
 											<option value="1974">1974</option>
@@ -224,7 +224,7 @@
 												От дорогих к дешевым
 											</option>
 											<option value="3">От старых к новым</option>
-											<option value="3">От новых к старым</option>
+											<option value="4">От новых к старым</option>
 										</select>
 									</div>
 								</div>
@@ -241,44 +241,13 @@
 										>
 											<option value="1">6</option>
 											<option value="2">12</option>
-											<option value="2">24</option>
-											<option value="2">60</option>
+											<option value="3">24</option>
+											<option value="4">60</option>
 										</select>
 									</div>
 								</div>
 							</div>
 							<div class="_grid _spacer _spacer--lg" data-insert></div>
-							<div class="_grid _justify-center">
-								<ul class="pagination">
-									<li class="pagination__item">
-										<a class="pagination__link">&lt;&lt;</a>
-									</li>
-									<li class="pagination__item">
-										<a class="pagination__link">&lt;</a>
-									</li>
-									<li class="pagination__item">
-										<a class="pagination__link active">1</a>
-									</li>
-									<li class="pagination__item">
-										<a class="pagination__link">2</a>
-									</li>
-									<li class="pagination__item">
-										<a class="pagination__link">3</a>
-									</li>
-									<li class="pagination__item">
-										<a class="pagination__link">4</a>
-									</li>
-									<li class="pagination__item">
-										<a class="pagination__link">5</a>
-									</li>
-									<li class="pagination__item">
-										<a class="pagination__link">&gt;</a>
-									</li>
-									<li class="pagination__item">
-										<a class="pagination__link">&gt;&gt;</a>
-									</li>
-								</ul>
-							</div>
 						</div>
 					</div>
 				</div>
@@ -345,6 +314,37 @@
 					</div>
 				</div>
 			</div>
+		</template>
+		<template id="pagination">
+			<ul class="pagination">
+				<li class="pagination__item">
+					<a class="pagination__link" data-page-back-twice onclick="history.go(-2)"></a>
+				</li>
+				<li class="pagination__item">
+					<a class="pagination__link" data-page-back onclick="history.back()"></a>
+				</li>
+				<li class="pagination__item">
+					<a class="pagination__link" data-page="1">1</a>
+				</li>
+				<li class="pagination__item">
+					<a class="pagination__link" data-page="2">2</a>
+				</li>
+				<li class="pagination__item">
+					<a class="pagination__link" data-page="3">3</a>
+				</li>
+				<li class="pagination__item">
+					<a class="pagination__link" data-page="4">4</a>
+				</li>
+				<li class="pagination__item">
+					<a class="pagination__link" data-page="5">5</a>
+				</li>
+				<li class="pagination__item">
+					<a class="pagination__link" data-page-forward onclick="history.forward()"></a>
+				</li>
+				<li class="pagination__item">
+					<a class="pagination__link" data-page-forward-twice onclick="history.go(2)"></a>
+				</li>
+			</ul>
 		</template>
 	</body>
 </html>

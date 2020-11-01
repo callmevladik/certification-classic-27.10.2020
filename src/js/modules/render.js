@@ -1,4 +1,4 @@
-export const render = (template, data, place, config) => {
+export const render = (template, data, container) => {
 	const buildMarkup = (data, maxSize) => {
 		const $template = $($(template)[0].content.children);
 		let markup = '';
@@ -24,11 +24,11 @@ export const render = (template, data, place, config) => {
 	};
 
 	const insertMarkup = (place) => {
-		$(place).html(buildMarkup(data));
+		$(place).append(buildMarkup(data));
 	};
 
 	const init = () => {
-		insertMarkup(place);
+		insertMarkup(container);
 	};
 
 	init();
