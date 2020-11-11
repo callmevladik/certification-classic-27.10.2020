@@ -1,5 +1,8 @@
-export const render = (template, data, container) => {
-	const buildMarkup = (data, maxSize) => {
+import globals from 'js#/globals';
+const { error } = globals;
+
+export const render = (template, data, container, errorMessage = error) => {
+	const buildMarkup = (data) => {
 		const $template = $($(template)[0].content.children);
 		let markup = '';
 
@@ -24,11 +27,19 @@ export const render = (template, data, container) => {
 	};
 
 	const insertMarkup = (place) => {
-		$(place).append(buildMarkup(data));
+		$(place).html(buildMarkup(data));
+	};
+
+	const leaveErrorMessage = (place) => {
+		$(place).html(errorMessage);
 	};
 
 	const init = () => {
-		insertMarkup(container);
+		if (data) {
+			insertMarkup(container);
+		} else {
+			leaveErrorMessage(container);
+		}
 	};
 
 	init();

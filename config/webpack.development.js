@@ -21,7 +21,7 @@ module.exports = merge(baseConfig, {
 		open: true,
 		compress: true,
 		hot: true,
-		port: 8080
+		port: 8081
 	},
 
 	plugins: [new webpack.HotModuleReplacementPlugin()]

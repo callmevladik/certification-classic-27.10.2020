@@ -2,47 +2,55 @@ export const filterParamList = {
 	page: {
 		name: 'page',
 		GET: 'page',
-		order: 1
+		type: 'number',
+		multiple: false
 	},
 	year: {
 		name: 'year',
 		GET: 'year',
-		order: 2
+		type: 'number',
+		multiple: false
 	},
 	priceFrom: {
 		name: 'price-from',
 		GET: 'price',
-		order: 3
+		type: 'number',
+		multiple: false
 	},
 	priceTo: {
 		name: 'price-to',
 		GET: 'price',
-		order: 4
+		type: 'number',
+		multiple: false
 	},
 	model: {
 		name: 'filter-model',
 		GET: 'model',
-		order: 5
+		type: 'string',
+		multiple: false
 	},
 	manufacturer: {
 		name: 'manufacturer',
 		GET: 'manufacturer',
-		order: 6
+		type: 'string',
+		multiple: false
 	},
 	brand: {
 		name: 'brand',
 		GET: 'brand',
-		order: 7,
+		type: 'string',
 		multiple: true
 	},
 	sort: {
 		name: 'sort',
 		GET: 'sort',
-		order: 8
+		type: 'string',
+		multiple: false
 	},
 	perPage: {
 		name: 'per_page',
 		GET: 'per-page',
-		order: 9
+		type: 'number',
+		multiple: false
 	}
 };
