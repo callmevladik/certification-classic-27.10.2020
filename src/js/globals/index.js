@@ -1,4 +1,7 @@
 export default {
+	cardsContainer: '[data-insert="cards"]',
+	paginationContainer: '[data-insert="pagination"]',
+	paginationSize: 5,
 	categoryChunkSize: [
 		{
 			value: 1,

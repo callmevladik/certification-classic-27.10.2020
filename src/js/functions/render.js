@@ -35,7 +35,7 @@ export const render = (template, data, container, errorMessage = error) => {
 	};
 
 	const init = () => {
-		if (data) {
+		if (data && data.length) {
 			insertMarkup(container);
 		} else {
 			leaveErrorMessage(container);

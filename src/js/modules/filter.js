@@ -1,22 +1,47 @@
+import globals from 'js#/globals';
+
 import { createGetParams } from 'js#/functions/createGetParams';
 import { getFormData } from 'js#/functions/getFormData';
 import { chunkData } from 'js#/functions/chunkData';
 import { render } from 'js#/functions/render';
-import globals from 'js#/globals';
-import data from 'js#/data/goods.json';
+import { pagination } from "js#/functions/pagination";
 
 export const filter = (selector, data) => {
-	const $elements = $(selector);
-	const { categoryChunkSize, filterError } = globals;
+	let $element = $(selector);
+	const { categoryChunkSize, filterError, cardsContainer, paginationContainer, paginationSize } = globals;
 	const currentChunkSize = categoryChunkSize[0].amount;
 	let params = {};
 	let initialData = data;
-	let dataForFiltering = {};
-	let dataForSorting = () => (dataForFiltering.length ? dataForFiltering : initialData);
+	let filteredData = {};
+	let transformedSerializedArray;
+	let chunkAmount = chunkData(data, currentChunkSize).length;
 
 	const transformSerializedArray = () => {
-		return $elements.serializeArray();
+		return $element.serializeArray();
 	};
+
+	const updateSerializedArray = () => {
+		transformedSerializedArray = transformSerializedArray();
+		console.log(transformedSerializedArray, params)
+	}
+
+	const updateParams = (serializedArray) => {
+		params = Object.assign(params, getFormData(serializedArray));
+	}
+
+	const updateChunkAmount = () => {
+		updateParams(transformedSerializedArray);
+		chunkAmount = chunkData(data, getChunkSize(params)).length;
+	}
+
+	const updateElement = () => {
+		$element = $(selector);
+	}
+
+	const getChunkSize = (params) => {
+		const { perPage } = params.pagination;
+		return categoryChunkSize.filter((el) => el.value === perPage)[0].amount
+	}
 
 	const pushState = (state) => {
 		const url = `?${$.param(state)}`;
@@ -58,13 +83,9 @@ export const filter = (selector, data) => {
 			);
 		}
 
-		dataForFiltering = newData;
-		render(
-			'#product-card',
-			chunkData(dataForFiltering, currentChunkSize)[0],
-			'[data-insert]',
-			filterError
-		);
+		filteredData = newData;
+
+		render('#product-card', chunkData(filteredData, currentChunkSize)[0],cardsContainer,filterError);
 	};
 
 	const sortData = (data, params) => {
@@ -81,19 +102,57 @@ export const filter = (selector, data) => {
 			}
 		});
 
-		render(
-			'#product-card',
-			chunkData(sorted, currentChunkSize)[0],
-			'[data-insert]',
-			filterError
-		);
+		filteredData = sorted;
+
+		if (filteredData && filteredData.length) { // не перерисовывать, если после фильтрации возвращается 0 результатов
+			render('#product-card', chunkData(filteredData, currentChunkSize)[0], cardsContainer);
+		}
 	};
 
-	$elements.on('change', () => {
-		const transformedSerializedArray = transformSerializedArray();
-		params = Object.assign(params, getFormData(transformedSerializedArray));
-		filterData(initialData, params);
-		sortData(dataForSorting(), params);
-		pushState(createGetParams(transformedSerializedArray));
-	});
+	const renderNewAmount = (data, params) => {
+		const newChunkSize = getChunkSize(params);
+
+		if (newChunkSize !== currentChunkSize) { // рендерить только новое количество
+			render('#product-card', chunkData(filteredData, newChunkSize)[0], cardsContainer);
+		}
+	}
+
+	const onPageClick = (container) => {
+		$(container)
+			.find('[data-pagination-item]')
+			.on('click', (e) => {
+				const currentTarget = $(e.currentTarget);
+				const input = currentTarget.parent().parent().find('input');
+				if (input.length) {
+					input.attr('value', currentTarget.attr('data-pagination-item'));
+					input.change();
+				}
+			});
+	};
+
+	const loadPage = (data, params) => {
+
+	}
+
+	const init = () => {
+		updateSerializedArray();
+		updateParams(transformedSerializedArray);
+		render('#product-card', chunkData(data, currentChunkSize)[0], cardsContainer);
+		pagination(chunkAmount, paginationSize, paginationContainer);
+		updateElement();
+		onPageClick(paginationContainer)
+
+		$element.on('change', () => {
+			updateSerializedArray();
+			updateChunkAmount();
+			updateParams(transformedSerializedArray);
+			filterData(initialData, params);
+			sortData(filteredData, params);
+			renderNewAmount(filteredData, params);
+			pushState(createGetParams(transformedSerializedArray));
+			pagination(chunkAmount, paginationSize, paginationContainer); // обновленные значения chunkAmount
+		});
+	}
+
+	init();
 };
