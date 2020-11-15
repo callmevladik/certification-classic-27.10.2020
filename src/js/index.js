@@ -19,5 +19,5 @@ import { filter } from 'js#/modules/filter';
 
 
 jQuery(function ($) {
-	const filterInstance = filter('.js-filter', data);
+	filter('.js-filter', data);
 });

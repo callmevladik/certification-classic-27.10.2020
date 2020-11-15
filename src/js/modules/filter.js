@@ -12,7 +12,7 @@ export const filter = (selector, data) => {
 	const currentChunkSize = categoryChunkSize[0].amount;
 	let params = {};
 	let initialData = data;
-	let filteredData = {};
+	let currentData = initialData;
 	let transformedSerializedArray;
 	let chunkAmount = chunkData(data, currentChunkSize).length;
 
@@ -22,19 +22,20 @@ export const filter = (selector, data) => {
 
 	const updateSerializedArray = () => {
 		transformedSerializedArray = transformSerializedArray();
-		console.log(transformedSerializedArray, params)
 	}
 
 	const updateParams = (serializedArray) => {
+		updateSerializedArray();
 		params = Object.assign(params, getFormData(serializedArray));
 	}
 
 	const updateChunkAmount = () => {
 		updateParams(transformedSerializedArray);
-		chunkAmount = chunkData(data, getChunkSize(params)).length;
+		chunkAmount = chunkData(currentData, getChunkSize(params)).length;
+		console.log('updated chunk amount =>', chunkAmount)
 	}
-
-	const updateElement = () => {
+	
+	const updateSelectorItems = () => {
 		$element = $(selector);
 	}
 
@@ -83,9 +84,10 @@ export const filter = (selector, data) => {
 			);
 		}
 
-		filteredData = newData;
-
-		render('#product-card', chunkData(filteredData, currentChunkSize)[0],cardsContainer,filterError);
+		currentData = newData;
+		render('#product-card', chunkData(currentData, currentChunkSize)[0],cardsContainer,filterError);
+		console.log('Произошла фильтрация =>', currentData);
+		pagination(chunkAmount, paginationSize, paginationContainer, updateChunkAmount);
 	};
 
 	const sortData = (data, params) => {
@@ -102,53 +104,53 @@ export const filter = (selector, data) => {
 			}
 		});
 
-		filteredData = sorted;
+		currentData = sorted;
 
-		if (filteredData && filteredData.length) { // не перерисовывать, если после фильтрации возвращается 0 результатов
-			render('#product-card', chunkData(filteredData, currentChunkSize)[0], cardsContainer);
+		if (currentData && currentData.length) { // не перерисовывать, если после фильтрации возвращается 0 результатов
+			render('#product-card', chunkData(currentData, currentChunkSize)[0], cardsContainer);
 		}
+
+		console.log('Произошла сортировка =>', currentData);
 	};
 
 	const renderNewAmount = (data, params) => {
 		const newChunkSize = getChunkSize(params);
 
 		if (newChunkSize !== currentChunkSize) { // рендерить только новое количество
-			render('#product-card', chunkData(filteredData, newChunkSize)[0], cardsContainer);
+			render('#product-card', chunkData(currentData, newChunkSize)[0], cardsContainer);
 		}
 	}
 
-	const onPageClick = (container) => {
-		$(container)
-			.find('[data-pagination-item]')
-			.on('click', (e) => {
+	const onPaginationClick = () => {
+		$('body')
+			.on('click', '[data-pagination-item]', (e) => {
 				const currentTarget = $(e.currentTarget);
 				const input = currentTarget.parent().parent().find('input');
 				if (input.length) {
 					input.attr('value', currentTarget.attr('data-pagination-item'));
-					input.change();
+					input.trigger('change');
+					const newChunkSize = input.attr('value');
+					render('#product-card', chunkData(currentData, currentChunkSize)[newChunkSize], cardsContainer);
 				}
 			});
 	};
-
-	const loadPage = (data, params) => {
-
-	}
 
 	const init = () => {
 		updateSerializedArray();
 		updateParams(transformedSerializedArray);
 		render('#product-card', chunkData(data, currentChunkSize)[0], cardsContainer);
 		pagination(chunkAmount, paginationSize, paginationContainer);
-		updateElement();
-		onPageClick(paginationContainer)
+		updateSelectorItems();
+		onPaginationClick()
 
 		$element.on('change', () => {
+			console.log('change')
 			updateSerializedArray();
-			updateChunkAmount();
+			updateSelectorItems();
 			updateParams(transformedSerializedArray);
 			filterData(initialData, params);
-			sortData(filteredData, params);
-			renderNewAmount(filteredData, params);
+			sortData(currentData, params);
+			renderNewAmount(currentData, params); // рендерит новое кол-во карточек
 			pushState(createGetParams(transformedSerializedArray));
 			pagination(chunkAmount, paginationSize, paginationContainer); // обновленные значения chunkAmount
 		});

@@ -26,19 +26,15 @@ export const render = (template, data, container, errorMessage = error) => {
 		return markup;
 	};
 
-	const insertMarkup = (place) => {
-		$(place).html(buildMarkup(data));
-	};
-
-	const leaveErrorMessage = (place) => {
-		$(place).html(errorMessage);
+	const insertMarkup = (place, markup) => {
+		$(place).html(markup);
 	};
 
 	const init = () => {
 		if (data && data.length) {
-			insertMarkup(container);
+			insertMarkup(container, buildMarkup(data));
 		} else {
-			leaveErrorMessage(container);
+			insertMarkup(container, errorMessage);
 		}
 	};
 
