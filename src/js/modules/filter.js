@@ -26,12 +26,23 @@ export const filter = (controlElementSelector, data) => {
 	let $filterControlElement = $anyFilterControlElement.filter((i, el) => $(el).data('filter-form-control') === 'filter');
 	let $sortControlElement = $anyFilterControlElement.filter((i, el) => $(el).data('filter-form-control') === 'sort');
 	let $paginationControlElement = $anyFilterControlElement.filter((i, el) => $(el).data('filter-form-control') === 'pagination');
+
+	// state
 	let params = {};
 	let initialData = data;
 	let currentData = initialData;
 	let transformedSerializedArray;
 	const currentChunkSize = chunkRules[0].amount;
 	let chunkAmount = chunkData(data, currentChunkSize).length;
+	let paginationState = () => {
+		return {
+			currentPageId: 1,
+			firstPageId: 1,
+			lastPageId: chunkAmount,
+			backPageId: this.currentPageId - 1,
+			nextPageId: this.currentPageId + 1
+		}
+	};
 
 	const transformSerializedArray = () => {
 		return $anyFilterControlElement.serializeArray();
@@ -123,9 +134,9 @@ export const filter = (controlElementSelector, data) => {
 
 		if (currentData && currentData.length) { // не перерисовывать, если после фильтрации возвращается 0 результатов
 			renderCard('#product-card', chunkData(currentData, currentChunkSize)[0], '[data-insert="cards"]');
+			console.log('Произошла сортировка =>', currentData);
+			pagination(chunkAmount, initialPaginationSize, '[data-insert="pagination"]', updateChunkAmount);
 		}
-
-		console.log('Произошла сортировка =>', currentData);
 	};
 
 	const renderNewCards = (data, params) => {
@@ -136,27 +147,12 @@ export const filter = (controlElementSelector, data) => {
 		}
 	}
 
-	const onPaginationClick = () => {
-		$('body')
-			.on('click', '[data-pagination-item]', (e) => {
-				const currentTarget = $(e.currentTarget);
-				const hiddenValueInput = currentTarget.parent().siblings('input');
-				if (hiddenValueInput.length) {
-					hiddenValueInput.attr('value', currentTarget.attr('[data-pagination-item]'));
-					hiddenValueInput.trigger('change');
-					const newChunkValue = hiddenValueInput.attr('value');
-					renderCard('#product-card', chunkData(currentData, currentChunkSize)[newChunkValue], '[data-insert="cards"]');
-				}
-			});
-	};
-
 	(() => {
 		updateSerializedArray();
 		updateParams(transformedSerializedArray);
 		renderCard('#product-card', chunkData(data, currentChunkSize)[0], '[data-insert="cards"]');
 		pagination(chunkAmount, initialPaginationSize, '[data-insert="pagination"]');
 		updateSelectorItems();
-		onPaginationClick();
 
 		$anyFilterControlElement.on('change', () => {
 			console.log('change');
@@ -164,17 +160,54 @@ export const filter = (controlElementSelector, data) => {
 			updateSelectorItems();
 			updateParams(transformedSerializedArray);
 			pushState(createGetParams(transformedSerializedArray));
-			pagination(chunkAmount, initialPaginationSize, '[data-insert="pagination"]'); // обновленные значения chunkAmount
 		});
 
 		$filterControlElement.on('change', () => {
 			filterData(initialData, params);
 			renderNewCards(currentData, params); // рендерит новое кол-во карточек
+			pagination(chunkAmount, initialPaginationSize, '[data-insert="pagination"]', updateChunkAmount);
 		});
 
 		$sortControlElement.on('change', () => {
 			sortData(currentData, params);
 			renderNewCards(currentData, params);
+			pagination(chunkAmount, initialPaginationSize, '[data-insert="pagination"]', updateChunkAmount);
+		});
+
+		$('body').on('click', '[data-pagination-item]', (e) => {
+			const currentTarget = $(e.currentTarget);
+			const currentTargetValue = currentTarget.attr('data-pagination-item');
+			const hiddenValueInput = currentTarget.parent().siblings('input');
+			if (hiddenValueInput.length) {
+				hiddenValueInput.val(currentTargetValue);
+
+				if(!isNaN(currentTargetValue)) {
+					hiddenValueInput.trigger('change');
+					const newChunkValue = hiddenValueInput.attr('value');
+					renderCard('#product-card', chunkData(currentData, currentChunkSize)[newChunkValue], '[data-insert="cards"]');
+				} else {
+					const currentPaginationState = paginationState();
+
+					if (currentTargetValue === 'back') {
+						hiddenValueInput.val(currentPaginationState.backPageId);
+					}
+					if (currentTargetValue === 'forward') {
+						hiddenValueInput.val(currentPaginationState.nextPageId);
+					}
+					if (currentTargetValue === 'first') {
+						hiddenValueInput.val(currentPaginationState.firstPageId);
+					}
+					if (currentTargetValue === 'last') {
+						hiddenValueInput.val(currentPaginationState.lastPageId);
+					} else {
+						return false;
+					}
+
+					hiddenValueInput.trigger('change');
+					const newChunkValue = hiddenValueInput.attr('value');
+					renderCard('#product-card', chunkData(currentData, currentChunkSize)[newChunkValue], '[data-insert="cards"]');
+				}
+			}
 		})
 	})();
 };

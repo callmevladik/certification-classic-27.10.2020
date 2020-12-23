@@ -82,7 +82,7 @@ export const filterRules = {
 		},
 		brand: {
 			inputName: 'brand',
-			getParamsNameParamName: 'brand',
+			getParamsName: 'brand',
 			type: 'string',
 			hasMultipleValues: true
 		},

@@ -18,6 +18,7 @@ export const pagination = (chunkAmount, paginationSize, container, updateCallbac
 					name="${paginationInputName}" 
 					form="filter"
 					data-filter-form-control="pagination"
+					value="1"
 				/>
 				${elements}
 			</ul>
@@ -46,8 +47,8 @@ export const pagination = (chunkAmount, paginationSize, container, updateCallbac
 					buttonsArray.push(paginationButtonMarkup(createPaginationItemSelector(i), `${i + 1}`));
 				}
 
-				buttonsArray.push(paginationButtonMarkup(createPaginationItemSelector('last'), `&gt;&gt;`));
 				buttonsArray.push(paginationButtonMarkup(createPaginationItemSelector('forward'), `&gt;`));
+				buttonsArray.push(paginationButtonMarkup(createPaginationItemSelector('last'), `&gt;&gt;`));
 			} else {
 				for (let i = 0; i < chunkAmount && i < paginationSize; i++) {
 					buttonsArray.push(paginationButtonMarkup(createPaginationItemSelector(i), `${i + 1}`));

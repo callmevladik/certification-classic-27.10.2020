@@ -7,8 +7,6 @@ export const getValue = (serializedArray, paramRule) => {
 		const value = serializedArray
 			.filter((param) => param.name === paramRule.inputName)
 			.map((param) => param.value);
-		
-		// console.log(value)
 
 		if (Array.isArray(value)) {
 			switch (paramRule.type) {
