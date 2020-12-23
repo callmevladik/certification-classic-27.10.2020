@@ -123,7 +123,6 @@ export const filter = (controlElementSelector, data) => {
 
 	const sortData = (data, params) => {
 		const currentSortValue = params.pagination.sort;
-		console.log(currentSortValue)
 		const properSortRule = sortRules.filter((rule) => rule.value === currentSortValue)[0];
 
 		currentData = data.sort((a, b) => {
@@ -177,7 +176,7 @@ export const filter = (controlElementSelector, data) => {
 			const currentTargetValue = currentTarget.attr('data-pagination-item');
 			const hiddenValueInput = currentTarget.parent().siblings('input');
 			if (hiddenValueInput.length) {
-				hiddenValueInput.val(currentTargetValue);
+				hiddenValueInput.val(+currentTargetValue + 1);
 
 				if(!isNaN(currentTargetValue)) {
 					hiddenValueInput.trigger('change');
