@@ -54,7 +54,6 @@ export const filter = (controlElementSelector, data) => {
 
 	const updateParams = (serializedArray) => {
 		updateSerializedArray();
-		console.log(getFormData(serializedArray));
 		params = Object.assign(params, getFormData(serializedArray));
 	}
 
@@ -126,7 +125,6 @@ export const filter = (controlElementSelector, data) => {
 		const currentSortValue = params.pagination.sort;
 		console.log(currentSortValue)
 		const properSortRule = sortRules.filter((rule) => rule.value === currentSortValue)[0];
-		console.log(properSortRule)
 
 		currentData = data.sort((a, b) => {
 			return properSortRule.initSort(a, b);
@@ -165,13 +163,13 @@ export const filter = (controlElementSelector, data) => {
 		$filterControlElement.on('change', () => {
 			filterData(initialData, params);
 			renderNewCards(currentData, params); // рендерит новое кол-во карточек
-			pagination(chunkAmount, initialPaginationSize, '[data-insert="pagination"]', updateChunkAmount);
+			pagination(chunkAmount, initialPaginationSize, '[data-insert="pagination"]');
 		});
 
 		$sortControlElement.on('change', () => {
 			sortData(currentData, params);
 			renderNewCards(currentData, params);
-			pagination(chunkAmount, initialPaginationSize, '[data-insert="pagination"]', updateChunkAmount);
+			pagination(chunkAmount, initialPaginationSize, '[data-insert="pagination"]');
 		});
 
 		$('body').on('click', '[data-pagination-item]', (e) => {

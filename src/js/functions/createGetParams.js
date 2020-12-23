@@ -7,10 +7,12 @@ export const createGetParams = (serializedArray) => {
 	return filterParamsRulesArray
 		.map((paramRule) => {
 			const returnValue = getValue(serializedArray, paramRule);
-			return {
-				name: paramRule.getParamsName,
-				value: returnValue
-			};
+			if (returnValue) {
+				return {
+					name: paramRule.getParamsName,
+					value: returnValue
+				};
+			}
 		})
 		.filter((el) => el);
 };
