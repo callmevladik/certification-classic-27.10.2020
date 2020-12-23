@@ -1,14 +1,14 @@
-import { filterParamList } from 'js#/globals/filterParamList';
 import { getValue } from 'js#/functions/getValue';
-
-const filterParamListArray = Object.values(filterParamList);
+import { filterRules } from "js#/globals/filterRules";
+const { filterParamsRules } = filterRules;
+const filterParamsRulesArray = Object.values(filterParamsRules);
 
 export const createGetParams = (serializedArray) => {
-	return filterParamListArray
-		.map((paramObj) => {
-			const returnValue = getValue(serializedArray, paramObj);
+	return filterParamsRulesArray
+		.map((paramRule) => {
+			const returnValue = getValue(serializedArray, paramRule);
 			return {
-				name: paramObj.GET,
+				name: paramRule.getParamsName,
 				value: returnValue
 			};
 		})

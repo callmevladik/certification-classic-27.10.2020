@@ -1,7 +1,7 @@
 import globals from 'js#/globals';
 const { error } = globals;
 
-export const render = (template, data, container, errorMessage = error) => {
+export const renderCard = (template, data, container, errorMessage = error) => {
 	const buildMarkup = (data) => {
 		const $template = $($(template)[0].content.children);
 		let markup = '';

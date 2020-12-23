@@ -17,7 +17,6 @@ import { filter } from 'js#/modules/filter';
 // Initialize
 // -----------------------------------------------------------------------------
 
-
 jQuery(function ($) {
-	filter('.js-filter', data);
+	filter('[data-filter-form-control]', data);
 });

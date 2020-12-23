@@ -1,23 +1,40 @@
 import globals from 'js#/globals';
 
+// functions
 import { createGetParams } from 'js#/functions/createGetParams';
 import { getFormData } from 'js#/functions/getFormData';
 import { chunkData } from 'js#/functions/chunkData';
-import { render } from 'js#/functions/render';
+import { renderCard } from 'js#/functions/renderCard';
 import { pagination } from "js#/functions/pagination";
+// filter rules
+import { filterRules } from "js#/globals/filterRules";
 
-export const filter = (selector, data) => {
-	let $element = $(selector);
-	const { categoryChunkSize, filterError, cardsContainer, paginationContainer, paginationSize } = globals;
-	const currentChunkSize = categoryChunkSize[0].amount;
+// some vars
+const {
+	pagination: { initialPaginationSize },
+	translates: { filterError },
+ } = globals;
+
+// filter rules
+const {
+	sortRules,
+	chunkRules
+} = filterRules;
+
+export const filter = (controlElementSelector, data) => {
+	let $anyFilterControlElement = $(controlElementSelector);
+	let $filterControlElement = $anyFilterControlElement.filter((i, el) => $(el).data('filter-form-control') === 'filter');
+	let $sortControlElement = $anyFilterControlElement.filter((i, el) => $(el).data('filter-form-control') === 'sort');
+	let $paginationControlElement = $anyFilterControlElement.filter((i, el) => $(el).data('filter-form-control') === 'pagination');
 	let params = {};
 	let initialData = data;
 	let currentData = initialData;
 	let transformedSerializedArray;
+	const currentChunkSize = chunkRules[0].amount;
 	let chunkAmount = chunkData(data, currentChunkSize).length;
 
 	const transformSerializedArray = () => {
-		return $element.serializeArray();
+		return $anyFilterControlElement.serializeArray();
 	};
 
 	const updateSerializedArray = () => {
@@ -26,22 +43,26 @@ export const filter = (selector, data) => {
 
 	const updateParams = (serializedArray) => {
 		updateSerializedArray();
+		console.log(getFormData(serializedArray));
 		params = Object.assign(params, getFormData(serializedArray));
 	}
 
 	const updateChunkAmount = () => {
 		updateParams(transformedSerializedArray);
 		chunkAmount = chunkData(currentData, getChunkSize(params)).length;
-		console.log('updated chunk amount =>', chunkAmount)
+		console.log('получено кол-во чанков =>', chunkAmount)
 	}
-	
+
 	const updateSelectorItems = () => {
-		$element = $(selector);
+		$anyFilterControlElement = $(controlElementSelector);
+		$filterControlElement = $anyFilterControlElement.filter((i, el) => $(el).data('filter-form-control') === 'filter');
+		$sortControlElement = $anyFilterControlElement.filter((i, el) => $(el).data('filter-form-control') === 'sort');
+		$paginationControlElement = $anyFilterControlElement.filter((i, el) => $(el).data('filter-form-control') === 'pagination');
 	}
 
 	const getChunkSize = (params) => {
 		const { perPage } = params.pagination;
-		return categoryChunkSize.filter((el) => el.value === perPage)[0].amount
+		return chunkRules.filter((el) => el.value === perPage)[0].amount
 	}
 
 	const pushState = (state) => {
@@ -85,39 +106,33 @@ export const filter = (selector, data) => {
 		}
 
 		currentData = newData;
-		render('#product-card', chunkData(currentData, currentChunkSize)[0],cardsContainer,filterError);
+		renderCard('#product-card', chunkData(currentData, currentChunkSize)[0], '[data-insert="cards"]', filterError);
 		console.log('Произошла фильтрация =>', currentData);
-		pagination(chunkAmount, paginationSize, paginationContainer, updateChunkAmount);
+		pagination(chunkAmount, initialPaginationSize, '[data-insert="pagination"]', updateChunkAmount);
 	};
 
 	const sortData = (data, params) => {
-		const sorted = data.sort((a, b) => {
-			switch (params.pagination.sort) {
-				case '1':
-					return a.price.value > b.price.value ? 1 : -1;
-				case '2':
-					return a.price.value < b.price.value ? 1 : -1;
-				case '3':
-					return a.year < b.year ? -1 : 1;
-				case '4':
-					return a.year > b.year ? -1 : 1;
-			}
+		const currentSortValue = params.pagination.sort;
+		console.log(currentSortValue)
+		const properSortRule = sortRules.filter((rule) => rule.value === currentSortValue)[0];
+		console.log(properSortRule)
+
+		currentData = data.sort((a, b) => {
+			return properSortRule.initSort(a, b);
 		});
 
-		currentData = sorted;
-
 		if (currentData && currentData.length) { // не перерисовывать, если после фильтрации возвращается 0 результатов
-			render('#product-card', chunkData(currentData, currentChunkSize)[0], cardsContainer);
+			renderCard('#product-card', chunkData(currentData, currentChunkSize)[0], '[data-insert="cards"]');
 		}
 
 		console.log('Произошла сортировка =>', currentData);
 	};
 
-	const renderNewAmount = (data, params) => {
+	const renderNewCards = (data, params) => {
 		const newChunkSize = getChunkSize(params);
 
 		if (newChunkSize !== currentChunkSize) { // рендерить только новое количество
-			render('#product-card', chunkData(currentData, newChunkSize)[0], cardsContainer);
+			renderCard('#product-card', chunkData(currentData, newChunkSize)[0], '[data-insert="cards"]');
 		}
 	}
 
@@ -125,36 +140,41 @@ export const filter = (selector, data) => {
 		$('body')
 			.on('click', '[data-pagination-item]', (e) => {
 				const currentTarget = $(e.currentTarget);
-				const input = currentTarget.parent().parent().find('input');
-				if (input.length) {
-					input.attr('value', currentTarget.attr('data-pagination-item'));
-					input.trigger('change');
-					const newChunkSize = input.attr('value');
-					render('#product-card', chunkData(currentData, currentChunkSize)[newChunkSize], cardsContainer);
+				const hiddenValueInput = currentTarget.parent().siblings('input');
+				if (hiddenValueInput.length) {
+					hiddenValueInput.attr('value', currentTarget.attr('[data-pagination-item]'));
+					hiddenValueInput.trigger('change');
+					const newChunkValue = hiddenValueInput.attr('value');
+					renderCard('#product-card', chunkData(currentData, currentChunkSize)[newChunkValue], '[data-insert="cards"]');
 				}
 			});
 	};
 
-	const init = () => {
+	(() => {
 		updateSerializedArray();
 		updateParams(transformedSerializedArray);
-		render('#product-card', chunkData(data, currentChunkSize)[0], cardsContainer);
-		pagination(chunkAmount, paginationSize, paginationContainer);
+		renderCard('#product-card', chunkData(data, currentChunkSize)[0], '[data-insert="cards"]');
+		pagination(chunkAmount, initialPaginationSize, '[data-insert="pagination"]');
 		updateSelectorItems();
-		onPaginationClick()
+		onPaginationClick();
 
-		$element.on('change', () => {
-			console.log('change')
+		$anyFilterControlElement.on('change', () => {
+			console.log('change');
 			updateSerializedArray();
 			updateSelectorItems();
 			updateParams(transformedSerializedArray);
-			filterData(initialData, params);
-			sortData(currentData, params);
-			renderNewAmount(currentData, params); // рендерит новое кол-во карточек
 			pushState(createGetParams(transformedSerializedArray));
-			pagination(chunkAmount, paginationSize, paginationContainer); // обновленные значения chunkAmount
+			pagination(chunkAmount, initialPaginationSize, '[data-insert="pagination"]'); // обновленные значения chunkAmount
 		});
-	}
 
-	init();
+		$filterControlElement.on('change', () => {
+			filterData(initialData, params);
+			renderNewCards(currentData, params); // рендерит новое кол-во карточек
+		});
+
+		$sortControlElement.on('change', () => {
+			sortData(currentData, params);
+			renderNewCards(currentData, params);
+		})
+	})();
 };

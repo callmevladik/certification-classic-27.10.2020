@@ -1,25 +1,8 @@
 export default {
-	cardsContainer: '[data-insert="cards"]',
-	paginationContainer: '[data-insert="pagination"]',
-	paginationSize: 5,
-	categoryChunkSize: [
-		{
-			value: 1,
-			amount: 6
-		},
-		{
-			value: 2,
-			amount: 12
-		},
-		{
-			value: 3,
-			amount: 24
-		},
-		{
-			value: 4,
-			amount: 60
-		}
-	],
-	filterError: 'По вашему запросу ничего не найдено',
-	error: 'Упс, произошла ошибка'
+	pagination: {
+		initialPaginationSize: 5
+	},
+	translates: {
+		filterError: 'По вашему запросу ничего не найдено'
+	}
 };

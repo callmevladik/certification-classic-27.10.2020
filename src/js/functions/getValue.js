@@ -1,17 +1,17 @@
-export const getValue = (serializedArray, paramObject) => {
-	if (paramObject.multiple) {
+export const getValue = (serializedArray, paramRule) => {
+	if (paramRule.hasMultipleValues) {
 		return serializedArray
-			.filter((param) => param.name === paramObject.name)
+			.filter((param) => param.name === paramRule.inputName)
 			.map((param) => param.value);
 	} else {
 		const value = serializedArray
-			.filter((param) => param.name === paramObject.name)
+			.filter((param) => param.name === paramRule.inputName)
 			.map((param) => param.value);
 		
 		// console.log(value)
 
 		if (Array.isArray(value)) {
-			switch (paramObject.type) {
+			switch (paramRule.type) {
 				case 'string':
 					return value.toString();
 				case 'number':

@@ -1,5 +1,6 @@
-import { filterParamList } from 'js#/globals/filterParamList';
 import { getValue } from 'js#/functions/getValue';
+import { filterRules } from "js#/globals/filterRules";
+const { filterParamsRules } = filterRules;
 
 const {
 	page,
@@ -11,7 +12,7 @@ const {
 	brand,
 	sort,
 	perPage
-} = filterParamList;
+} = filterParamsRules;
 
 export const getFormData = (serializedArray) => {
 	return {

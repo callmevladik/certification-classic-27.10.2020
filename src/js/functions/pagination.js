@@ -1,17 +1,27 @@
-import { filterParamList } from "js#/globals/filterParamList";
+import { filterRules } from "js#/globals/filterRules";
+const { filterParamsRules } = filterRules;
+const paginationInputName = filterParamsRules.page.inputName;
 
-const paginationInputName = filterParamList.page.name;
+const createPaginationItemSelector = value => {
+	return `data-pagination-item="${value}"`;
+}
 
 export const pagination = (chunkAmount, paginationSize, container, updateCallback) => {
 	// console.log(chunkAmount, paginationSize);
 
 	const paginationMarkup = (elements) => {
 		return `
-				<ul class="pagination">
-					<input type="hidden" id="${paginationInputName}" name="${paginationInputName}" form="filter" value="" class="js-filter"/>
-					${elements}
-				</ul>
-			`
+			<ul class="pagination">
+				<input 
+					type="hidden" 
+					id="${paginationInputName}" 
+					name="${paginationInputName}" 
+					form="filter"
+					data-filter-form-control="pagination"
+				/>
+				${elements}
+			</ul>
+		`
 	};
 
 	const paginationButtonMarkup = (attribute, text) => {
@@ -29,24 +39,18 @@ export const pagination = (chunkAmount, paginationSize, container, updateCallbac
 
 		if (chunkAmount > 1) {
 			if (chunkAmount > paginationSize) {
-				buttonsArray.push(paginationButtonMarkup('data-pagination-item="first"', `&lt;&lt;`));
-				buttonsArray.push(paginationButtonMarkup('data-pagination-item="back"', `&lt;`));
-				for (let i = 0; i < chunkAmount; i++) {
-					if (i === paginationSize) {
-						break;
-					}
+				buttonsArray.push(paginationButtonMarkup(createPaginationItemSelector('first'), `&lt;&lt;`));
+				buttonsArray.push(paginationButtonMarkup(createPaginationItemSelector('back'), `&lt;`));
 
-					buttonsArray.push(paginationButtonMarkup(`data-pagination-item="${i}"`, `${i + 1}`));
+				for (let i = 0; i < chunkAmount && i < paginationSize; i++) {
+					buttonsArray.push(paginationButtonMarkup(createPaginationItemSelector(i), `${i + 1}`));
 				}
-				buttonsArray.push(paginationButtonMarkup('data-pagination-item="last"', `&gt;&gt;`));
-				buttonsArray.push(paginationButtonMarkup('data-pagination-item="forward"', `&gt;`));
-			} else {
-				for (let i = 0; i < chunkAmount; i++) {
-					if (i === paginationSize) {
-						break;
-					}
 
-					buttonsArray.push(paginationButtonMarkup(`data-pagination-item="${i}"`, `${i + 1}`));
+				buttonsArray.push(paginationButtonMarkup(createPaginationItemSelector('last'), `&gt;&gt;`));
+				buttonsArray.push(paginationButtonMarkup(createPaginationItemSelector('forward'), `&gt;`));
+			} else {
+				for (let i = 0; i < chunkAmount && i < paginationSize; i++) {
+					buttonsArray.push(paginationButtonMarkup(createPaginationItemSelector(i), `${i + 1}`));
 				}
 			}
 		}
@@ -70,5 +74,6 @@ export const pagination = (chunkAmount, paginationSize, container, updateCallbac
 	if (updateCallback) {
 		updateCallback();
 	}
+
 	init();
 };
